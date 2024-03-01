@@ -13,7 +13,7 @@ export const App = () => {
   };
 
   return (
-    <div
+    <main
       className={clsx(styles.main)}
       style={
         {
@@ -27,6 +27,6 @@ export const App = () => {
       }>
       <ArticleParamsForm pageState={pageState} updatePageState={updatePageState} />
       <Article />
-    </div>
+    </main>
   );
 };

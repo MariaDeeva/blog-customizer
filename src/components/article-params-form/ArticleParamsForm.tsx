@@ -2,26 +2,29 @@ import { ArrowButton } from 'components/arrow-button';
 import { Button } from 'components/button';
 import { Text } from 'components/text';
 import styles from './ArticleParamsForm.module.scss';
-import React, { useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Select } from '../select';
 import { Separator } from '../separator';
 import { OptionType, defaultArticleState, contentWidthArr, fontColors, fontFamilyOptions, fontSizeOptions, backgroundColors, ArticleStateType } from 'src/constants/articleProps';
 import { RadioGroup } from '../radio-group';
+import { forceReRender } from '@storybook/react';
+import { useClose } from '../hooks/useClose';
 
 type ArticleParamsFormProps = {
 	pageState: ArticleStateType;
 	updatePageState: (newState: ArticleStateType) => void;
 };
 
-export const ArticleParamsForm = ({ pageState, updatePageState }: ArticleParamsFormProps) => {
-	const [isFormVisible, setIsFormVisible] = useState(false);
+export const ArticleParamsForm = ({ updatePageState }: ArticleParamsFormProps) => {
+	const [isFormVisible, setIsFormVisible] = useState<boolean>(false);
 	const [fontFamily, setFontFamily] = useState(defaultArticleState.fontFamilyOption);
 	const [fontColor, setFontColor] = useState(defaultArticleState.fontColor);
 	const [contentWidth, setContentWidth] = useState(defaultArticleState.contentWidth);
 	const [fontSize, setFontSize] = useState(defaultArticleState.fontSizeOption);
 	const [backgroundColor, setBackgroundColor] = useState(defaultArticleState.backgroundColor);
-
+	const formRef = useRef<HTMLDivElement>(null)
 	const handleToggleForm = () => setIsFormVisible(!isFormVisible);
+
 	const handleResetForm = () => {
 		setFontFamily(defaultArticleState.fontFamilyOption);
 		setFontColor(defaultArticleState.fontColor);
@@ -29,6 +32,7 @@ export const ArticleParamsForm = ({ pageState, updatePageState }: ArticleParamsF
 		setFontSize(defaultArticleState.fontSizeOption);
 		setBackgroundColor(defaultArticleState.backgroundColor);
 	};
+
 	const handleChange = (type: keyof ArticleStateType, value: OptionType) => {
 		switch (type) {
 			case 'fontFamilyOption':
@@ -47,8 +51,8 @@ export const ArticleParamsForm = ({ pageState, updatePageState }: ArticleParamsF
 				setBackgroundColor(value);
 				break;
 		}
-		updatePageState({ ...pageState, [type]: value });
 	};
+
 	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		updatePageState({
@@ -60,11 +64,16 @@ export const ArticleParamsForm = ({ pageState, updatePageState }: ArticleParamsF
 		});
 		setIsFormVisible(false);
 	};
+	useClose({
+        isFormVisible,
+        onClose: () => setIsFormVisible(false),
+        rootRef: formRef,
+    });
 
 	return (
-		<>
+		<div ref={formRef}>
 			<ArrowButton onClick={handleToggleForm} isFormVisible={isFormVisible} />
-			<aside className={`${styles.container} ${isFormVisible ? styles.container_open : ''}`}>
+			<aside className={`${styles.container} ${isFormVisible ? styles.container_open : ''}`} >
 				<form className={styles.form} onSubmit={handleSubmit}>
 					<Text
 						size={31}
@@ -113,6 +122,6 @@ export const ArticleParamsForm = ({ pageState, updatePageState }: ArticleParamsF
 					</div>
 				</form>
 			</aside>
-		</>
+		</div>
 	);
 };
